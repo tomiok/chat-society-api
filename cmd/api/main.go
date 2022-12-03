@@ -20,6 +20,10 @@ func run() {
 	r.Post("/rooms", deps.handler.AddRoom())
 	r.Get("/ws", deps.handler.RegisterWebsocket())
 
+	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte("pong"))
+	})
+
 	port := os.Getenv("PORT")
 
 	if port == "" {
