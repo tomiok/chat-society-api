@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/go-chi/chi/v5"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -19,8 +20,14 @@ func run() {
 	r.Post("/rooms", deps.handler.AddRoom())
 	r.Get("/ws", deps.handler.RegisterWebsocket())
 
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		port = "9001"
+	}
+
 	srv := &http.Server{
-		Addr: ":9001",
+		Addr: ":" + port,
 		// Good practice to set timeouts to avoid Slowloris attacks.
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
