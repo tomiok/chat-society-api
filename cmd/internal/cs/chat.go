@@ -52,13 +52,9 @@ type Participant struct {
 var i int
 
 func (c *ChatService) AddParticipant(nick string) *Participant {
-	id := "0"
-	if i > 0 {
-		id = "1"
-	}
+
 	participant := &Participant{
-		//ID:       generateRandomRune(),
-		ID:       id,
+		ID:       generateRandomRune(),
 		Nick:     NickGenerator(nick),
 		JoinedAt: time.Now(),
 	}
