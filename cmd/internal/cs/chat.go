@@ -1,7 +1,7 @@
 package cs
 
 import (
-	"chat-society-api/cmd/internal/platform/trace"
+	"chat-society-api/cmd/platform/trace"
 	"fmt"
 	"github.com/rs/zerolog/log"
 	"math/rand"

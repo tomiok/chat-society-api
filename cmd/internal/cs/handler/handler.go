@@ -2,8 +2,8 @@ package handler
 
 import (
 	"chat-society-api/cmd/internal/cs"
-	"chat-society-api/cmd/internal/platform/trace"
-	"chat-society-api/cmd/internal/platform/web"
+	"chat-society-api/cmd/platform/trace"
+	"chat-society-api/cmd/platform/web"
 	"encoding/json"
 	"github.com/rs/zerolog/log"
 	"net/http"
