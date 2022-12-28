@@ -150,7 +150,7 @@ func (c *ChatService) applyBroadcast(roomID, message string) {
 	participants, err := c.GetParticipantsByRoom(roomID)
 
 	if err != nil {
-		log.Warn().Msgf("cannot get participants %s, trace: %s", err.Error(), trace.Trace())
+		log.Warn().Msgf("%s - cannot get participants %s", trace.Trace(), err.Error())
 		return
 	}
 	for _, participant := range participants {
