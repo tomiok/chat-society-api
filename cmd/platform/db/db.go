@@ -7,7 +7,7 @@ import (
 
 type StorageService interface {
 	Save(format string, values ...any) (int64, error)
-	GetByID(query string, id int64) (*sql.Row, error)
+	GetByID(query string, id int64) *sql.Row
 
 	Many(query string, params ...any) (*sql.Rows, error)
 	One(query string, params ...any) *sql.Row
@@ -51,8 +51,8 @@ func (m *MySql) Save(format string, values ...any) (int64, error) {
 	return id, nil
 }
 
-func (m *MySql) GetByID(str string, id int64) (*sql.Row, error) {
-
+func (m *MySql) GetByID(str string, id int64) *sql.Row {
+	return m.QueryRow(str, id)
 }
 
 func (m *MySql) Many(query string, args ...any) (*sql.Rows, error) {
