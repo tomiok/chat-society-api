@@ -2,30 +2,19 @@ package cs
 
 import (
 	"chat-society-api/cmd/internal/platform/trace"
-	"github.com/gorilla/websocket"
+	"context"
+	"fmt"
 	"github.com/rs/zerolog/log"
 	"net/http"
+	"nhooyr.io/websocket"
 	"time"
 )
 
 const (
-	// Time allowed to write a message to the peer.
-	writeWait = 5 * time.Minute
-
 	// Time allowed to read the next pong message from the peer.
-	pongWait = 1 * time.Hour
-
-	// Maximum message size allowed from peer.
-	maxMessageSize = 1024 * 2
+	pongWait = 1 * time.Second
 
 	pingPeriod = (pongWait * 9) / 10
-)
-
-var (
-	u = websocket.Upgrader{
-		ReadBufferSize:  1024,
-		WriteBufferSize: 1024,
-	}
 )
 
 type WebsocketConn struct {
@@ -40,34 +29,28 @@ type WebsocketConn struct {
 // reads from this goroutine.
 func (w *WebsocketConn) ReadPump(messageHandler func(msg string)) {
 	defer func() {
-		w.close()
+		w.close(fmt.Sprintf("%s - closing reader", trace.Trace()))
 	}()
-	w.Conn.SetReadLimit(maxMessageSize)
-	_ = w.Conn.SetReadDeadline(time.Now().Add(pongWait))
-	w.Conn.SetPongHandler(
-		func(string) error {
-			return w.Conn.SetReadDeadline(time.Now().Add(pongWait))
-		},
-	)
+
 	for {
-		_, s, err := w.Conn.ReadMessage()
+		msgType, msg, err := w.Read(context.Background())
+
 		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Warn().Msgf("%s unexpected close error", trace.Trace())
-			}
-			log.Warn().Msgf("%s cannot read message %s", trace.Trace(), err.Error())
+			log.Error().Msgf("%s -  %s", trace.Trace(), err.Error())
 			break
 		}
 
+		log.Info().Msgf("sending message. Type: %d", msgType)
+
 		//message handler
-		messageHandler(string(s))
+		messageHandler(string(msg))
 	}
 }
 
 // close the handler connection
-func (w *WebsocketConn) close() {
-	close(w.Send)
-	err := w.Close()
+func (w *WebsocketConn) close(msg string) {
+	close(w.Send) //this close cause panic FIXME
+	err := w.Close(websocket.StatusNormalClosure, msg)
 
 	if err != nil {
 		log.Warn().Msgf("%s cannot close connection %s", trace.Trace(), err.Error())
@@ -75,13 +58,7 @@ func (w *WebsocketConn) close() {
 }
 
 func RegistrationHandler(w http.ResponseWriter, r *http.Request) (*WebsocketConn, error) {
-	u.CheckOrigin = func(r *http.Request) bool {
-		return true
-	}
-
-	responseHeader := make(http.Header)
-	conn, err := u.Upgrade(w, r, responseHeader)
-
+	conn, err := websocket.Accept(w, r, nil)
 	return &WebsocketConn{
 		Conn: conn,
 		Send: make(chan string),
@@ -89,7 +66,6 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request) (*WebsocketConn
 }
 
 // WritePump pumps messages from the hub to the websocket connection.
-//
 // A goroutine running WritePump is started for each connection. The
 // application ensures that there is at most one writer to a connection by
 // executing all writes from this goroutine.
@@ -97,28 +73,26 @@ func (w *WebsocketConn) WritePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
-		w.close()
+		w.close("err")
 	}()
 	for {
 		select {
 		case message, ok := <-w.Send:
-			_ = w.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
-				// The hub closed the channel.
-				_ = w.WriteMessage(websocket.CloseMessage, []byte{})
-				log.Warn().Msg("websocket is closed")
-				return
+				w.close("no messages")
 			}
 
-			err := w.WriteMessage(websocket.TextMessage, []byte(message))
+			err := w.Write(context.Background(), websocket.MessageText, []byte(message))
 			if err != nil {
-				return
+				w.close("cannot write " + err.Error())
 			}
 		case <-ticker.C:
-			_ = w.SetWriteDeadline(time.Now().Add(writeWait))
-			if err := w.WriteMessage(websocket.PingMessage, nil); err != nil {
-				return
+			err := w.Ping(context.Background())
+			if err != nil {
+				w.close(fmt.Sprintf("no ping available -  %v", err))
+				break
 			}
+			log.Info().Msg("pinging...")
 		}
 	}
 }

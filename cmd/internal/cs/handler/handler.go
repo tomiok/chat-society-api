@@ -2,6 +2,7 @@ package handler
 
 import (
 	"chat-society-api/cmd/internal/cs"
+	"chat-society-api/cmd/internal/platform/trace"
 	"chat-society-api/cmd/internal/platform/web"
 	"encoding/json"
 	"github.com/rs/zerolog/log"
@@ -117,7 +118,7 @@ func (h *Handler) RegisterWebsocket() func(w http.ResponseWriter, r *http.Reques
 
 		client, err := cs.RegistrationHandler(w, r)
 		if err != nil {
-			log.Error().Msg(err.Error())
+			log.Error().Msgf("%s - %s", trace.Trace(), err.Error())
 			return
 		}
 
