@@ -23,7 +23,7 @@ type ChatRepository interface {
 	AddParticipant(p *Participant) error
 	FindParticipant(id string) (*Participant, error)
 
-	AddRoom(r *Room) error
+	CreateRoom(r *Room) error
 	FindRoom(id string) (*Room, error)
 
 	JoinParticipant(roomID string, p *Participant) error
@@ -88,7 +88,7 @@ type Room struct {
 
 	// configuration
 	IsModerated bool
-	Moderator   *string
+	Moderator   string
 
 	IsOnlyAudio bool
 	IsOnlyText  bool
@@ -119,7 +119,7 @@ func (c *ChatService) AddRoom(roomReq RoomReq) *Room {
 		Description:  roomReq.Description,
 		Owner:        "system",
 		IsModerated:  false,
-		Moderator:    nil,
+		Moderator:    "",
 		IsOnlyAudio:  false,
 		IsOnlyText:   true,
 		IsBoth:       false,
@@ -129,7 +129,7 @@ func (c *ChatService) AddRoom(roomReq RoomReq) *Room {
 		URL:          ws,
 		CreatedAt:    time.Now(),
 	}
-	_ = c.ChatRepository.AddRoom(room)
+	_ = c.ChatRepository.CreateRoom(room)
 
 	go c.BroadcastMessage(roomID, room.Broadcast)
 	return room

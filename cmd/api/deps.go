@@ -10,7 +10,7 @@ type Deps struct {
 }
 
 func buildDeps() *Deps {
-	chatRepo := repository.NewChatRepository()
+	chatRepo := repository.newChatRepository()
 	chatHandler := handler.NewHandler(chatRepo)
 	return &Deps{
 		handler: chatHandler,

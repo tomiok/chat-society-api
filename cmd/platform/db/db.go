@@ -6,8 +6,8 @@ import (
 )
 
 type StorageService interface {
-	Save(format string, values ...any) (int64, error)
-	GetByID(query string, id int64) *sql.Row
+	Save(format string, values ...any) error
+	GetByID(query string, id string) *sql.Row
 
 	Many(query string, params ...any) (*sql.Rows, error)
 	One(query string, params ...any) *sql.Row
@@ -36,22 +36,17 @@ func New(url string) (StorageService, error) {
 	}, nil
 }
 
-func (m *MySql) Save(format string, values ...any) (int64, error) {
-	result, err := m.Exec(format, values)
+func (m *MySql) Save(format string, values ...any) error {
+	_, err := m.Exec(format, values)
 
 	if err != nil {
-		return 0, err
+		return err
 	}
 
-	id, err := result.LastInsertId()
-
-	if err != nil {
-		return 0, err
-	}
-	return id, nil
+	return nil
 }
 
-func (m *MySql) GetByID(str string, id int64) *sql.Row {
+func (m *MySql) GetByID(str string, id string) *sql.Row {
 	return m.QueryRow(str, id)
 }
 
