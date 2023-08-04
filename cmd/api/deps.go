@@ -4,6 +4,7 @@ import (
 	"chat-society-api/internal/cs/handler"
 	"chat-society-api/internal/cs/repository"
 	"chat-society-api/platform/db"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var mysqlURI = "tomi:tomi@tcp(localhost:3306)/chats_dev"
