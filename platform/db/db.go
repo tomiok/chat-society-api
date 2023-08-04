@@ -17,14 +17,14 @@ type MySql struct {
 	*sql.DB
 }
 
-func New(url string) (StorageService, error) {
+func New(url string) (*MySql, error) {
 	db, err := sql.Open("mysql", url)
 
 	if err != nil {
 		return nil, err
 	}
 	db.SetConnMaxLifetime(time.Minute * 3)
-	db.SetMaxOpenConns(10)
+	db.SetMaxOpenConns(20)
 	db.SetMaxIdleConns(10)
 
 	if err = db.Ping(); err != nil {

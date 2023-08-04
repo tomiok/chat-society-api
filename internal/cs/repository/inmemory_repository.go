@@ -1,24 +1,24 @@
 package repository
 
 import (
-	"chat-society-api/cmd/internal/cs"
+	"chat-society-api/internal/cs"
 	"errors"
 	"fmt"
 	"github.com/rs/zerolog/log"
 )
 
-type inMemoryStorage struct{}
+type InMemoryStorage struct{}
 
-func newInMemoryStorage() *inMemoryStorage {
-	return &inMemoryStorage{}
+func NewInMemoryStorage() *InMemoryStorage {
+	return &InMemoryStorage{}
 }
 
-func (c *inMemoryStorage) Add(p *cs.Participant) error {
+func (c *InMemoryStorage) Add(p *cs.Participant) error {
 	Participants[p.ID] = p
 	return nil
 }
 
-func (c *inMemoryStorage) Find(id string) (*cs.Participant, error) {
+func (c *InMemoryStorage) Find(id string) (*cs.Participant, error) {
 	p, ok := Participants[id]
 
 	if !ok {
@@ -29,7 +29,7 @@ func (c *inMemoryStorage) Find(id string) (*cs.Participant, error) {
 	return p, nil
 }
 
-func (c *inMemoryStorage) AddToRoom(roomID string, p *cs.Participant) error {
+func (c *InMemoryStorage) AddToRoom(roomID string, p *cs.Participant) error {
 	participants, ok := ParticipantsByRoom[roomID]
 
 	if !ok {
@@ -41,7 +41,7 @@ func (c *inMemoryStorage) AddToRoom(roomID string, p *cs.Participant) error {
 	return nil
 }
 
-func (c *inMemoryStorage) GetByRoom(roomID string) ([]*cs.Participant, error) {
+func (c *InMemoryStorage) GetByRoom(roomID string) ([]*cs.Participant, error) {
 	participants, ok := ParticipantsByRoom[roomID]
 
 	if !ok {
@@ -53,14 +53,14 @@ func (c *inMemoryStorage) GetByRoom(roomID string) ([]*cs.Participant, error) {
 }
 
 // AddRoom create a room in memory.
-func (c *inMemoryStorage) AddRoom(r *cs.Room) error {
+func (c *InMemoryStorage) AddRoom(r *cs.Room) error {
 	Rooms[r.ID] = r
 	ParticipantsByRoom[r.ID] = make([]*cs.Participant, 1000)
 	return nil
 }
 
 // GetParticipantsByRoom given a room, return all the participants. Maybe debug only.
-func (c *inMemoryStorage) GetParticipantsByRoom(roomID string) ([]*cs.Participant, error) {
+func (c *InMemoryStorage) GetParticipantsByRoom(roomID string) ([]*cs.Participant, error) {
 	participants, ok := ParticipantsByRoom[roomID]
 
 	if !ok {

@@ -1,16 +1,23 @@
 package main
 
 import (
-	"chat-society-api/cmd/internal/cs/handler"
-	"chat-society-api/cmd/internal/cs/repository"
+	"chat-society-api/internal/cs/handler"
+	"chat-society-api/internal/cs/repository"
+	"chat-society-api/platform/db"
 )
+
+var mysqlURI = "tomi:tomi@tcp(localhost:3306)/chats_dev"
 
 type Deps struct {
 	handler *handler.Handler
 }
 
 func buildDeps() *Deps {
-	chatRepo := repository.newChatRepository()
+	mySQL, err := db.New(mysqlURI)
+	if err != nil {
+		panic(err)
+	}
+	chatRepo := repository.NewStorage(mySQL)
 	chatHandler := handler.NewHandler(chatRepo)
 	return &Deps{
 		handler: chatHandler,

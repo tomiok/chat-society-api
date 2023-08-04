@@ -1,19 +1,19 @@
 package repository
 
 import (
-	"chat-society-api/cmd/internal/cs"
-	"chat-society-api/cmd/platform/db"
+	"chat-society-api/internal/cs"
+	"chat-society-api/platform/db"
 )
 
 type Storage struct {
 	db.StorageService
-	*inMemoryStorage
+	*InMemoryStorage
 }
 
 func NewStorage(mySql *db.MySql) *Storage {
 	return &Storage{
 		StorageService:  mySql,
-		inMemoryStorage: newInMemoryStorage(),
+		InMemoryStorage: NewInMemoryStorage(),
 	}
 }
 

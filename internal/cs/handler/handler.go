@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"chat-society-api/cmd/internal/cs"
-	"chat-society-api/cmd/platform/trace"
-	"chat-society-api/cmd/platform/web"
+	"chat-society-api/internal/cs"
+	"chat-society-api/platform/trace"
+	"chat-society-api/platform/web"
 	"encoding/json"
 	"github.com/rs/zerolog/log"
 	"net/http"
@@ -89,7 +89,7 @@ func (h *Handler) AddRoom() func(w http.ResponseWriter, r *http.Request) {
 			Description: room.Description,
 			Owner:       room.Owner,
 			IsModerated: room.IsModerated,
-			Moderator:   room.Moderator,
+			Moderator:   &room.Moderator,
 			IsOnlyAudio: room.IsOnlyAudio,
 			IsOnlyText:  room.IsOnlyText,
 			IsBoth:      false,
