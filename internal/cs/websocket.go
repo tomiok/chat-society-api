@@ -49,7 +49,7 @@ func (w *WebsocketConn) ReadPump(messageHandler func(msg string)) {
 
 // close the handler connection
 func (w *WebsocketConn) close(msg string) {
-	close(w.Send) //this close cause panic FIXME
+	//close(w.Send) //this close cause panic FIXME
 	err := w.Close(websocket.StatusNormalClosure, msg)
 
 	if err != nil {

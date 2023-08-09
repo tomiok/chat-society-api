@@ -132,7 +132,7 @@ func (h *Handler) RegisterWebsocket() func(w http.ResponseWriter, r *http.Reques
 		}
 
 		// join participant to the chat service
-		err = h.ChatService.Join(roomID, p)
+		err = h.ChatService.Join(room.ID, p)
 
 		if err != nil {
 			log.Error().Msg(err.Error())

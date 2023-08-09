@@ -49,17 +49,13 @@ type Participant struct {
 	JoinedAt time.Time // TODO define this or move up to current room
 }
 
-var i int
-
 func (c *ChatService) AddParticipant(nick string) *Participant {
-
 	participant := &Participant{
 		ID:       generateRandomRune(),
 		Nick:     NickGenerator(nick),
 		JoinedAt: time.Now(),
 	}
 	_ = c.ChatRepository.AddParticipant(participant)
-	i++
 	return participant
 }
 
@@ -136,14 +132,14 @@ func (c *ChatService) AddRoom(roomReq RoomReq) *Room {
 }
 
 func (c *ChatService) BroadcastMessage(roomID string, ch chan string) {
-	go func() {
-		for {
-			select {
-			case message := <-ch:
-				c.applyBroadcast(roomID, message)
-			}
+
+	for {
+		select {
+		case message := <-ch:
+			c.applyBroadcast(roomID, message)
 		}
-	}()
+	}
+
 }
 
 func (c *ChatService) applyBroadcast(roomID, message string) {
@@ -154,15 +150,20 @@ func (c *ChatService) applyBroadcast(roomID, message string) {
 		return
 	}
 	for _, participant := range participants {
-		participant := participant
+		part := participant
 		go func() {
-			participant.Conn.Send <- message
+			part.Conn.Send <- message
 		}()
 	}
 }
 
 func (c *ChatService) FindRoomByID(id string) (*Room, error) {
-	return c.FindRoom(id)
+	_, err := c.FindRoom(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return Rooms[id], nil
 }
 
 var runes = []rune("abcdefghijklmnopqrstuvwxyz1234567890")

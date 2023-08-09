@@ -7,7 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var mysqlURI = "tomi:tomi@tcp(localhost:3306)/chats_dev"
+var mysqlURI = "tomi:tomi@tcp(localhost:3306)/chats_dev?parseTime=true"
 
 type Deps struct {
 	handler *handler.Handler

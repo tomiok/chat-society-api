@@ -46,7 +46,10 @@ func (m *MySql) Save(format string, values ...any) error {
 	return nil
 }
 
-func (m *MySql) GetByID(str string, id string) *sql.Row {
+func (m *MySql) GetByID(str, id string) *sql.Row {
+	if id == "" {
+		return m.QueryRow(str)
+	}
 	return m.QueryRow(str, id)
 }
 
@@ -55,5 +58,5 @@ func (m *MySql) Many(query string, args ...any) (*sql.Rows, error) {
 }
 
 func (m *MySql) One(query string, args ...any) *sql.Row {
-	return m.QueryRow(query, args)
+	return m.QueryRow(query, args...)
 }

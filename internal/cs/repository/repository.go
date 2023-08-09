@@ -3,6 +3,8 @@ package repository
 import (
 	"chat-society-api/internal/cs"
 	"chat-society-api/platform/db"
+	"errors"
+	"github.com/rs/zerolog/log"
 )
 
 type Storage struct {
@@ -26,7 +28,7 @@ func (s *Storage) FindParticipant(id string) (*cs.Participant, error) {
 }
 
 func (s *Storage) CreateRoom(r *cs.Room) error {
-	err := s.One("insert into room values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+	err := s.One("insert into room (id, title, description, owner, is_moderated, moderator, is_only_audio, is_only_text, is_both, max, url, created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 		r.ID, r.Title, r.Description, r.Owner, r.IsModerated, r.Moderator, r.IsOnlyAudio, r.IsOnlyText, r.IsBoth, 250, r.URL, r.CreatedAt).Err()
 
 	if err != nil {
@@ -37,7 +39,8 @@ func (s *Storage) CreateRoom(r *cs.Room) error {
 }
 
 func (s *Storage) FindRoom(id string) (*cs.Room, error) {
-	query := "select id, title, description, owner, is_moderated, moderator, is_only_audio, is_only_text, is_both, max, url, created_at from room where id=?"
+	query := "select id, title, description, owner, is_moderated, moderator, is_only_audio, is_only_text, is_both, max, url from room where id=?"
+
 	row := s.GetByID(query, id)
 	var res cs.Room
 
@@ -53,7 +56,6 @@ func (s *Storage) FindRoom(id string) (*cs.Room, error) {
 		&res.IsBoth,
 		&res.Max,
 		&res.URL,
-		&res.CreatedAt,
 	)
 
 	if err != nil {
@@ -64,7 +66,7 @@ func (s *Storage) FindRoom(id string) (*cs.Room, error) {
 }
 
 func (s *Storage) JoinParticipant(roomID string, p *cs.Participant) error {
-	_, err := s.Find(roomID)
+	_, err := s.FindRoom(roomID)
 
 	if err != nil {
 		return err
@@ -74,6 +76,12 @@ func (s *Storage) JoinParticipant(roomID string, p *cs.Participant) error {
 }
 
 func (s *Storage) GetParticipantsByRoom(roomID string) ([]*cs.Participant, error) {
-	//TODO implement me
-	panic("implement me")
+	participants, ok := cs.ParticipantsByRoom[roomID]
+
+	if !ok {
+		log.Warn().Msgf("no participants in room %s", roomID)
+		return nil, errors.New("")
+	}
+
+	return participants, nil
 }
