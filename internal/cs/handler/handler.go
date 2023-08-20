@@ -13,9 +13,9 @@ type Handler struct {
 	ChatService *cs.ChatService
 }
 
-func NewHandler(repo cs.ChatRepository) *Handler {
+func NewHandler(repo cs.ChatRepository, cp *cs.ChatPeople) *Handler {
 	return &Handler{
-		ChatService: cs.NewChatService(repo),
+		ChatService: cs.NewChatService(repo, cp),
 	}
 }
 

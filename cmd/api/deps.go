@@ -1,6 +1,7 @@
 package main
 
 import (
+	"chat-society-api/internal/cs"
 	"chat-society-api/internal/cs/handler"
 	"chat-society-api/internal/cs/repository"
 	"chat-society-api/platform/db"
@@ -14,12 +15,18 @@ type Deps struct {
 }
 
 func buildDeps() *Deps {
+	chatPeople := &cs.ChatPeople{
+		Participants:       make(map[string]*cs.Participant),
+		Rooms:              make(map[string]*cs.Room),
+		ParticipantsByRoom: make(map[string][]*cs.Participant),
+	}
+
 	mySQL, err := db.New(mysqlURI)
 	if err != nil {
 		panic(err)
 	}
 	chatRepo := repository.NewStorage(mySQL)
-	chatHandler := handler.NewHandler(chatRepo)
+	chatHandler := handler.NewHandler(chatRepo, chatPeople)
 	return &Deps{
 		handler: chatHandler,
 	}

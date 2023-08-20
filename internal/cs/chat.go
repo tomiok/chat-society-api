@@ -17,6 +17,7 @@ type Message struct {
 
 type ChatService struct {
 	ChatRepository
+	*ChatPeople
 }
 
 type ChatRepository interface {
@@ -31,9 +32,10 @@ type ChatRepository interface {
 	GetAllRooms() ([]Room, error)
 }
 
-func NewChatService(r ChatRepository) *ChatService {
+func NewChatService(r ChatRepository, chatPeople *ChatPeople) *ChatService {
 	return &ChatService{
 		r,
+		chatPeople,
 	}
 }
 
@@ -130,7 +132,6 @@ func (c *ChatService) AddRoom(roomReq RoomReq) *Room {
 }
 
 func (c *ChatService) BroadcastMessage(roomID string, ch chan string) {
-
 	for {
 		select {
 		case message := <-ch:
@@ -161,7 +162,7 @@ func (c *ChatService) FindRoomByID(id string) (*Room, error) {
 		return nil, err
 	}
 
-	return Rooms[id], nil
+	return c.Rooms[id], nil
 }
 
 func (c *ChatService) GetAllRooms() ([]Room, error) {
@@ -180,9 +181,16 @@ func generateRandomRune() string {
 	randRune := make([]rune, 11)
 
 	for i := range randRune {
-		rand.Seed(time.Now().UnixNano())
-
 		randRune[i] = runes[rand.Intn(len(runes))]
 	}
 	return string(randRune)
+}
+
+type ChatPeople struct {
+	// List of connected participants
+	Participants map[string]*Participant
+	// List of rooms
+	Rooms map[string]*Room
+	// roomID and every participant in that room
+	ParticipantsByRoom map[string][]*Participant
 }

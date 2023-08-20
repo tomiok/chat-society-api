@@ -76,7 +76,7 @@ func (s *Storage) JoinParticipant(roomID string, p *cs.Participant) error {
 }
 
 func (s *Storage) GetParticipantsByRoom(roomID string) ([]*cs.Participant, error) {
-	participants, ok := cs.ParticipantsByRoom[roomID]
+	participants, ok := s.ParticipantsByRoom[roomID]
 
 	if !ok {
 		log.Warn().Msgf("no participants in room %s", roomID)

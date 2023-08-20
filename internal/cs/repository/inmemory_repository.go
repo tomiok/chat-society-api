@@ -7,19 +7,21 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type InMemoryStorage struct{}
+type InMemoryStorage struct {
+	cs.ChatPeople
+}
 
 func NewInMemoryStorage() *InMemoryStorage {
 	return &InMemoryStorage{}
 }
 
 func (c *InMemoryStorage) Add(p *cs.Participant) error {
-	cs.Participants[p.ID] = p
+	c.Participants[p.ID] = p
 	return nil
 }
 
 func (c *InMemoryStorage) Find(id string) (*cs.Participant, error) {
-	p, ok := cs.Participants[id]
+	p, ok := c.Participants[id]
 
 	if !ok {
 		log.Error().Msgf("cannot find participant with id %s", id)
@@ -30,7 +32,7 @@ func (c *InMemoryStorage) Find(id string) (*cs.Participant, error) {
 }
 
 func (c *InMemoryStorage) FindRoom(id string) (*cs.Room, error) {
-	r, ok := cs.Rooms[id]
+	r, ok := c.Rooms[id]
 
 	if !ok {
 		log.Error().Msgf("cannot find participant with id %s", id)
@@ -41,19 +43,19 @@ func (c *InMemoryStorage) FindRoom(id string) (*cs.Room, error) {
 }
 
 func (c *InMemoryStorage) AddToRoom(roomID string, p *cs.Participant) error {
-	participants, ok := cs.ParticipantsByRoom[roomID]
+	participants, ok := c.ParticipantsByRoom[roomID]
 
 	if !ok {
 		return fmt.Errorf("room %s is not in our server", roomID)
 	}
 
 	participants = append(participants, p)
-	cs.ParticipantsByRoom[roomID] = participants
+	c.ParticipantsByRoom[roomID] = participants
 	return nil
 }
 
 func (c *InMemoryStorage) GetByRoom(roomID string) ([]*cs.Participant, error) {
-	participants, ok := cs.ParticipantsByRoom[roomID]
+	participants, ok := c.ParticipantsByRoom[roomID]
 
 	if !ok {
 		log.Warn().Msgf("no participants in room %s", roomID)
@@ -65,14 +67,14 @@ func (c *InMemoryStorage) GetByRoom(roomID string) ([]*cs.Participant, error) {
 
 // AddRoom create a room in memory.
 func (c *InMemoryStorage) AddRoom(r *cs.Room) error {
-	cs.Rooms[r.ID] = r
-	cs.ParticipantsByRoom[r.ID] = make([]*cs.Participant, 0)
+	c.Rooms[r.ID] = r
+	c.ParticipantsByRoom[r.ID] = make([]*cs.Participant, 0)
 	return nil
 }
 
 // GetParticipantsByRoom given a room, return all the participants. Maybe debug only.
 func (c *InMemoryStorage) GetParticipantsByRoom(roomID string) ([]*cs.Participant, error) {
-	participants, ok := cs.ParticipantsByRoom[roomID]
+	participants, ok := c.ParticipantsByRoom[roomID]
 
 	if !ok {
 		log.Warn().Msgf("no participants in room %s", roomID)
