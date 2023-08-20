@@ -51,7 +51,7 @@ func ResponseUnauthorized(w http.ResponseWriter, msg string) {
 	_, _ = w.Write(r)
 }
 
-func ResponseOK(w http.ResponseWriter, msg string, data interface{}) {
+func ResponseOK(w http.ResponseWriter, msg string, data any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(HttpResponse{

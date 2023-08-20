@@ -54,7 +54,7 @@ func (m *MySql) GetByID(str, id string) *sql.Row {
 }
 
 func (m *MySql) Many(query string, args ...any) (*sql.Rows, error) {
-	return m.Query(query, args)
+	return m.Query(query, args...)
 }
 
 func (m *MySql) One(query string, args ...any) *sql.Row {

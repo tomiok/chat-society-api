@@ -18,6 +18,7 @@ func run() {
 
 	r.Post("/participants", deps.handler.AddParticipant())
 	r.Post("/rooms", deps.handler.AddRoom())
+	r.Get("/rooms", deps.handler.GetRooms())
 	r.Get("/ws", deps.handler.RegisterWebsocket())
 
 	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {

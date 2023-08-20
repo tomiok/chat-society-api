@@ -28,6 +28,7 @@ type ChatRepository interface {
 
 	JoinParticipant(roomID string, p *Participant) error
 	GetParticipantsByRoom(roomID string) ([]*Participant, error)
+	GetAllRooms() ([]Room, error)
 }
 
 func NewChatService(r ChatRepository) *ChatService {
@@ -76,29 +77,26 @@ func NickGenerator(nick string) string {
 // Room
 
 type Room struct {
-	ID          string
-	Title       string
-	Description string
+	ID          string `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
 
-	Owner string
+	Owner string `json:"owner"`
 
 	// configuration
-	IsModerated bool
-	Moderator   string
+	IsModerated bool   `json:"is_moderated"`
+	Moderator   string `json:"moderator"`
 
-	IsOnlyAudio bool
-	IsOnlyText  bool
-	IsBoth      bool
+	IsOnlyAudio bool `json:"is_only_audio"`
+	IsOnlyText  bool `json:"is_only_text"`
+	IsBoth      bool `json:"is_both"`
 
-	Max int // 250 hardcoded max number
+	Max          int                    `json:"max"` // 250 hardcoded max number js
+	Participants map[string]Participant `json:"-"`
 
-	Participants map[string]Participant
-
-	Broadcast chan string
-
-	URL string
-
-	CreatedAt time.Time
+	Broadcast chan string `json:"-"`
+	URL       string      `json:"url"`
+	CreatedAt time.Time   `json:"created_at"`
 }
 
 type RoomReq struct {
@@ -164,6 +162,16 @@ func (c *ChatService) FindRoomByID(id string) (*Room, error) {
 	}
 
 	return Rooms[id], nil
+}
+
+func (c *ChatService) GetAllRooms() ([]Room, error) {
+	rooms, err := c.ChatRepository.GetAllRooms()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return rooms, nil
 }
 
 var runes = []rune("abcdefghijklmnopqrstuvwxyz1234567890")

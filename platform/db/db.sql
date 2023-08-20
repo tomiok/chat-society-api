@@ -1,7 +1,7 @@
 CREATE TABLE rooms
 (
     ID          VARCHAR(255) NOT NULL,
-    Title       VARCHAR(255),
+    Title       VARCHAR(255) UNIQUE,
     Description TEXT,
     Owner       VARCHAR(255),
     IsModerated BOOLEAN,

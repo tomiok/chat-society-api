@@ -50,6 +50,18 @@ func (h *Handler) AddParticipant() func(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
+func (h *Handler) GetRooms() func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		rooms, err := h.ChatService.GetAllRooms()
+		if err != nil {
+			web.ResponseInternalError(w, "cannot get rooms: "+err.Error())
+			return
+		}
+
+		web.ResponseOK(w, "rooms", rooms)
+	}
+}
+
 func (h *Handler) AddRoom() func(w http.ResponseWriter, r *http.Request) {
 	type j struct {
 		ID          string `json:"id"`

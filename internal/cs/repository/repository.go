@@ -85,3 +85,40 @@ func (s *Storage) GetParticipantsByRoom(roomID string) ([]*cs.Participant, error
 
 	return participants, nil
 }
+
+func (s *Storage) GetAllRooms() ([]cs.Room, error) {
+	rows, err := s.Many("select id, title, description, owner, is_moderated, is_only_text, is_only_audio, is_both, max, url from room")
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		_ = rows.Close()
+	}()
+
+	var result []cs.Room
+	for rows.Next() {
+		var room cs.Room
+		err = rows.Scan(
+			&room.ID,
+			&room.Title,
+			&room.Description,
+			&room.Owner,
+			&room.IsModerated,
+			&room.IsOnlyText,
+			&room.IsOnlyAudio,
+			&room.IsBoth,
+			&room.Max,
+			&room.URL,
+		)
+
+		if err != nil {
+			log.Warn().Err(err).Msg("cannot get room")
+			continue
+		}
+
+		result = append(result, room)
+	}
+
+	// TODO add binding with in-memory rooms here.
+	return result, nil
+}
