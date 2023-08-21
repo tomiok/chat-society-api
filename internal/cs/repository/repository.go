@@ -5,6 +5,8 @@ import (
 	"chat-society-api/platform/db"
 	"errors"
 	"github.com/rs/zerolog/log"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Storage struct {
@@ -121,4 +123,22 @@ func (s *Storage) GetAllRooms() ([]cs.Room, error) {
 
 	// TODO add binding with in-memory rooms here.
 	return result, nil
+}
+
+func (s *Storage) Login(nick, passwordHash string) (string, error) {
+	row := s.One("select password from participants where nick=?", nick)
+
+	var password string
+	err := row.Scan(&password)
+
+	if err != nil {
+		return "", err
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password))
+
+	if err != nil {
+		return "", err
+	}
+
+	return "tokenOK", nil
 }
