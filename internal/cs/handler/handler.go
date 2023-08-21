@@ -59,6 +59,7 @@ func (h *Handler) AddParticipant() func(w http.ResponseWriter, r *http.Request) 
 		ID   string `json:"id"`
 		Nick string `json:"nick"`
 	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		body := r.Body
 		defer func() {

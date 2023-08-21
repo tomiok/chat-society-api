@@ -22,7 +22,26 @@ func NewStorage(mySql *db.MySql) *Storage {
 }
 
 func (s *Storage) AddParticipant(p *cs.Participant) error {
-	return s.Add(p)
+	// add in memory.
+	err := s.Add(p)
+	if err != nil {
+		return err
+	}
+
+	bytes, err := bcrypt.GenerateFromPassword([]byte(p.Password), 14)
+
+	if err != nil {
+		return err
+	}
+
+	// add in DB.
+	err = s.Save("insert into participants (nick, password) values (?,?)", p.Nick, string(bytes))
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *Storage) FindParticipant(id string) (*cs.Participant, error) {

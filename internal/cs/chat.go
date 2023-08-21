@@ -42,9 +42,10 @@ func NewChatService(r ChatRepository, chatPeople *ChatPeople) *ChatService {
 
 // Participant is the actor of the room. Could join only one room at once.
 type Participant struct {
-	ID     string  // uid
-	Nick   string  // the name given + some random numer
-	Gender *string // optional gender
+	ID       string  // uid
+	Nick     string  // the name given + some random numer
+	Password string  // the pass :D
+	Gender   *string // optional gender
 
 	CurrentRoom string
 
