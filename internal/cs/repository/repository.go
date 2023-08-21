@@ -14,10 +14,10 @@ type Storage struct {
 	*InMemoryStorage
 }
 
-func NewStorage(mySql *db.MySql) *Storage {
+func NewStorage(mySql *db.MySql, chatPeople *cs.ChatPeople) *Storage {
 	return &Storage{
 		StorageService:  mySql,
-		InMemoryStorage: NewInMemoryStorage(),
+		InMemoryStorage: NewInMemoryStorage(chatPeople),
 	}
 }
 

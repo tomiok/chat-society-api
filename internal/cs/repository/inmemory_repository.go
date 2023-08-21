@@ -8,11 +8,13 @@ import (
 )
 
 type InMemoryStorage struct {
-	cs.ChatPeople
+	*cs.ChatPeople
 }
 
-func NewInMemoryStorage() *InMemoryStorage {
-	return &InMemoryStorage{}
+func NewInMemoryStorage(chatPeople *cs.ChatPeople) *InMemoryStorage {
+	return &InMemoryStorage{
+		chatPeople,
+	}
 }
 
 func (c *InMemoryStorage) Add(p *cs.Participant) error {

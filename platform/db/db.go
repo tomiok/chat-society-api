@@ -36,8 +36,8 @@ func New(url string) (*MySql, error) {
 	}, nil
 }
 
-func (m *MySql) Save(format string, values ...any) error {
-	_, err := m.Exec(format, values)
+func (m *MySql) Save(format string, args ...any) error {
+	_, err := m.Exec(format, args...)
 
 	if err != nil {
 		return err

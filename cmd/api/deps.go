@@ -25,7 +25,7 @@ func buildDeps() *Deps {
 	if err != nil {
 		panic(err)
 	}
-	chatRepo := repository.NewStorage(mySQL)
+	chatRepo := repository.NewStorage(mySQL, chatPeople)
 	chatHandler := handler.NewHandler(chatRepo, chatPeople)
 	return &Deps{
 		handler: chatHandler,
