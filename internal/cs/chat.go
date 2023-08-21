@@ -23,6 +23,7 @@ type ChatService struct {
 type ChatRepository interface {
 	AddParticipant(p *Participant) error
 	FindParticipant(id string) (*Participant, error)
+	Login(nick, pass string) (string, error)
 
 	CreateRoom(r *Room) error
 	FindRoom(id string) (*Room, error)
@@ -173,6 +174,10 @@ func (c *ChatService) GetAllRooms() ([]Room, error) {
 	}
 
 	return rooms, nil
+}
+
+func (c *ChatService) Login(nick, pass string) (string, error) {
+	return c.ChatRepository.Login(nick, pass)
 }
 
 var runes = []rune("abcdefghijklmnopqrstuvwxyz1234567890")

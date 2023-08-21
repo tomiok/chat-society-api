@@ -19,6 +19,37 @@ func NewHandler(repo cs.ChatRepository, cp *cs.ChatPeople) *Handler {
 	}
 }
 
+func (h *Handler) Login() func(w http.ResponseWriter, r *http.Request) {
+	type req struct {
+		Nick     string `json:"nick"`
+		Password string `json:"password"`
+	}
+	type res struct {
+		Token string `json:"token"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		body := r.Body
+		defer func() {
+			_ = body.Close()
+		}()
+		var _req req
+		err := json.NewDecoder(body).Decode(&_req)
+		if err != nil {
+			web.ResponseInternalError(w, err.Error())
+			return
+		}
+
+		token, err := h.ChatService.Login(_req.Nick, _req.Password)
+
+		if err != nil {
+			web.ResponseInternalError(w, err.Error())
+			return
+		}
+
+		web.ResponseOK(w, "log in OK", &res{Token: token})
+	}
+}
+
 func (h *Handler) AddParticipant() func(w http.ResponseWriter, r *http.Request) {
 	type b struct {
 		Nick string `json:"nick"`
