@@ -13,11 +13,11 @@ type StorageService interface {
 	One(query string, params ...any) *sql.Row
 }
 
-type MySql struct {
+type DB struct {
 	*sql.DB
 }
 
-func New(url string) (*MySql, error) {
+func New(url string) (*DB, error) {
 	db, err := sql.Open("mysql", url)
 
 	if err != nil {
@@ -31,12 +31,12 @@ func New(url string) (*MySql, error) {
 		panic(err)
 	}
 
-	return &MySql{
+	return &DB{
 		db,
 	}, nil
 }
 
-func (m *MySql) Save(format string, args ...any) error {
+func (m *DB) Save(format string, args ...any) error {
 	_, err := m.Exec(format, args...)
 
 	if err != nil {
@@ -46,17 +46,17 @@ func (m *MySql) Save(format string, args ...any) error {
 	return nil
 }
 
-func (m *MySql) GetByID(str, id string) *sql.Row {
+func (m *DB) GetByID(str, id string) *sql.Row {
 	if id == "" {
 		return m.QueryRow(str)
 	}
 	return m.QueryRow(str, id)
 }
 
-func (m *MySql) Many(query string, args ...any) (*sql.Rows, error) {
+func (m *DB) Many(query string, args ...any) (*sql.Rows, error) {
 	return m.Query(query, args...)
 }
 
-func (m *MySql) One(query string, args ...any) *sql.Row {
+func (m *DB) One(query string, args ...any) *sql.Row {
 	return m.QueryRow(query, args...)
 }
